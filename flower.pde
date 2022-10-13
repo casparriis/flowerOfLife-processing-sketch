@@ -3,8 +3,10 @@ FlowerOfLife flowerPoints;
 int noOfPoints, noOfParticles;
 float noiseScale, circleSize;
 Particle[] particles; 
+JSONArray flowerDataArray;
+JSONObject flowerData;
 OpenSimplexNoise openSimplex;
-float flowerAttraction, centreAttraction, randomness;
+float flowerAttraction, centreAttraction, randomness, particleMaxSpeed;
 Particle controller;
 float controllerXSpeed, controllerYSpeed, controllerXSize, controllerYSize, controllerXOffset, controllerYOffset;
 //float p;
@@ -15,7 +17,7 @@ void setup() {
   size(800, 800);
   //frameRate = 60;
   noOfPoints = 50;
-  noOfParticles = 7000;
+  noOfParticles = 5000;
   particles = new Particle[noOfParticles];
   circleSize = 300;
   flowerPoints = new FlowerOfLife(noOfPoints, circleSize);
@@ -23,35 +25,35 @@ void setup() {
   openSimplex = new OpenSimplexNoise(12345);
   noiseScale = 10;
   
-  controller = new Particle();
-  controller.maxSpeed = .1;
-  //p = createP();
+  controller = new Particle(new PVector(0,0), .1);
 
   startFrame = 106;
   gifLength = 429;
   
+  flowerDataArray = loadJSONArray("flowerData.json");
+  flowerData = flowerDataArray.getJSONObject(0);
+  
   //Fave 1
-  //controllerXSpeed = .05;
-  //controllerYSpeed = .02;
-  controllerXSpeed = .03;
-  controllerYSpeed = .015;
-  controllerXSize = 500;
-  controllerYSize = 40;
-  controllerXOffset = 20;
-  controllerYOffset = 0;
-  randomness = 20;
+  controllerXSpeed = flowerData.getFloat("controllerXSpeed");
+  controllerYSpeed = flowerData.getFloat("controllerYSpeed");
+  controllerXSize = flowerData.getFloat("controllerXSize");
+  controllerYSize = flowerData.getFloat("controllerYSize");
+  controllerXOffset = flowerData.getFloat("controllerXOffset");
+  controllerYOffset = flowerData.getFloat("controllerYOffset");
+  randomness = flowerData.getFloat("randomness");
+  particleMaxSpeed = flowerData.getFloat("particleMaxSpeed");
 
   particles = new Particle[noOfParticles];
   
   for (int i = 0; i < particles.length; i++) {
-    particles[i] = new Particle();
     float angle = random(TWO_PI);
-    particles[i].pos = new PVector(
+    particles[i] = new Particle(new PVector(
       cos(angle) * random(width/3),
       sin(angle) * random(width/3)
       //random(-(width/2-200), (width/2-200) ), 
       //random(-(width/2-200), (width/2-200) )
-    );
+    ), particleMaxSpeed);
+    
   }
 }
 

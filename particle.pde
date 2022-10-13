@@ -5,11 +5,11 @@ class Particle {
     float maxSpeed;
     
   
-    Particle () {
-        this.pos = new PVector(0,0);
+    Particle (PVector pos, float maxSpeed) {
+        this.pos = pos;
         this.vel = new PVector(0,0);
         this.acc = new PVector(0,0);
-        this.maxSpeed = 2;
+        this.maxSpeed = maxSpeed;
     }
 
     void update() {

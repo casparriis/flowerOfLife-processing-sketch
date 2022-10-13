@@ -1,0 +1,13 @@
+[
+    {
+        "id" : 0,
+        "controllerXSpeed" : 0.03,
+        "controllerYSpeed" : 0.015,
+        "controllerXSize" : 500,
+        "controllerYSize" : 40,
+        "controllerXOffset" : 20,
+        "controllerYOffset" : 0,
+        "randomness" : 20,
+        "particleMaxSpeed" : 2
+    }
+]
