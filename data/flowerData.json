@@ -9,5 +9,16 @@
         "controllerYOffset" : 0,
         "randomness" : 20,
         "particleMaxSpeed" : 2
+    },
+    {
+        "id" : 1,
+        "controllerXSpeed" : 0.03,
+        "controllerYSpeed" : 0.04,
+        "controllerXSize" : 400,
+        "controllerYSize" : 40,
+        "controllerXOffset" : 20,
+        "controllerYOffset" : 20,
+        "randomness" : 20,
+        "particleMaxSpeed" : 3.5
     }
 ]

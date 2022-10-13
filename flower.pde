@@ -76,7 +76,7 @@ void draw() {
   float controllerPointValue = 228;
   
   controller.pos = new PVector(controllerPosX, controllerPosY);
-  //controller.show(controllerPointValue,5);
+  controller.show(controllerPointValue,5);
 
   flowerAttraction = map(controllerPosY, 0, height, 0, 10);
   centreAttraction = map(controllerPosX, 0, width, -0.0005, 0.2);
