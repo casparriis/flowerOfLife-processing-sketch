@@ -1,6 +1,7 @@
 PVector startPos;
 FlowerOfLife flowerPoints;
-int noOfPoints, noOfParticles;
+Rose rose;
+int noOfPoints, noOfRosePoints, noOfParticles;
 float noiseScale, circleSize;
 Particle[] particles; 
 JSONArray flowerDataArray;
@@ -11,27 +12,35 @@ Particle controller;
 float controllerXSpeed, controllerYSpeed, controllerXSize, controllerYSize, controllerXOffset, controllerYOffset;
 //float p;
 
+boolean recording = true;
 float startFrame, gifLength;
 
 void setup() {
   size(800, 800);
   //frameRate = 60;
   noOfPoints = 50;
+  noOfRosePoints = 800;
   noOfParticles = 5000;
   particles = new Particle[noOfParticles];
   circleSize = 300;
   flowerPoints = new FlowerOfLife(noOfPoints, circleSize);
+  rose = new Rose(noOfRosePoints, 300, 7, 9);
   
   openSimplex = new OpenSimplexNoise(12345);
   noiseScale = 10;
   
   controller = new Particle(new PVector(0,0), .1);
 
-  startFrame = 106;
-  gifLength = 429;
+  //Xspeed 0.03
+  //startFrame = 106;
+  //gifLength = 629;
+  
+  //Xspeed 0.02
+  startFrame = 159;
+  gifLength = 314;
   
   flowerDataArray = loadJSONArray("flowerData.json");
-  flowerData = flowerDataArray.getJSONObject(0);
+  flowerData = flowerDataArray.getJSONObject(2);
   
   //Fave 1
   controllerXSpeed = flowerData.getFloat("controllerXSpeed");
@@ -55,6 +64,8 @@ void setup() {
     ), particleMaxSpeed);
     
   }
+  
+  
 }
 
 void draw() {
@@ -66,7 +77,8 @@ void draw() {
   strokeWeight(2);
   noFill();
   translate(startPos.x, startPos.y);
-  rotate(TWO_PI/gifLength * frameCount/2);
+  rotate(TWO_PI/gifLength * frameCount);
+  //rotate(TWO_PI/4);
 
   float controllerPosX = sin(frameCount * controllerXSpeed) * controllerXSize + controllerXOffset;
   if ( controllerPosX > -10 && controllerPosX < 10 ) println(frameCount);
@@ -76,12 +88,35 @@ void draw() {
   float controllerPointValue = 228;
   
   controller.pos = new PVector(controllerPosX, controllerPosY);
-  controller.show(controllerPointValue,5);
+  //controller.show(controllerPointValue,5);
 
   flowerAttraction = map(controllerPosY, 0, height, 0, 10);
   centreAttraction = map(controllerPosX, 0, width, -0.0005, 0.2);
 
-  //particles.forEach(p => {
+  particleUpdate();  
+  
+  push();
+  stroke(155);
+  for (int i = 0; i < rose.points.length; ++i) {
+    //println(rosePoints.points[i]);
+    //point(rose.points[i].x, rose.points[i].y);
+  }
+  pop();
+  //flowerPoints.circles.forEach(circle => {
+    //circle.draw(255, 1);
+  //});
+
+  //if (recording && frameCount > startFrame && frameCount <= startFrame + gifLength && frameCount % 2 == 0) {
+  if (recording && frameCount > startFrame && frameCount <= startFrame + gifLength) {
+    saveFrame("/gifs/gif5/fr###.gif");
+  }
+  
+  
+  //noLoop();
+}
+
+void particleUpdate() {
+  push();
   for (int i = 0; i < particles.length; i++) {
     float particleValue = (float)(openSimplex.eval(i/noiseScale,frameCount/noiseScale) + 0.75) * 128;
     float particleSize = (float)(openSimplex.eval(i/noiseScale,frameCount/noiseScale) + 1.75) * 2;
@@ -90,7 +125,8 @@ void draw() {
     
     particles[i].show(particleValue, particleSize);
     particles[i].addForce(new PVector(random(-.1,.1),random(-.1,.1)).mult(randomness));
-    particles[i].addForce(getDirectionToNearestFlowerPosition(particles[i].pos).mult(flowerAttraction));
+    //particles[i].addForce(getDirectionToNearestFlowerPosition(particles[i].pos).mult(flowerAttraction));
+    particles[i].addForce(getDirectionToNearestPoint(particles[i].pos, rose.points).mult(flowerAttraction));
     
     //centreAttraction *= (dist(0,0, particles[i].pos.x, particles[i].pos.y)* 0.001);
     //particles[i].maxSpeed = map(flowerAttraction, 0, 5, 4, 0);
@@ -101,20 +137,30 @@ void draw() {
     particles[i].update();
     //particles[i].edges();
   }
-
-
-  //flowerPoints.circles.forEach(circle => {
-    //circle.draw(255, 1);
-  //});
-
-  if (frameCount > startFrame && frameCount <= startFrame + gifLength) {
-    //saveFrame("/gif2/fr###.gif");
-  }
-  
-  
-  //noLoop();
+  pop();
 }
 
+PVector getDirectionToNearestPoint(PVector particlePos, PVector[] targetPoints) {
+  
+  float currentClosestDist = width * 10;
+  PVector currentClosestPoint = null;
+  
+  for (int i = 0; i < targetPoints.length; i++) {
+    
+    float distToPoint = dist(particlePos.x, particlePos.y, targetPoints[i].x, targetPoints[i].y);
+    if ( distToPoint < currentClosestDist) {
+      currentClosestDist = distToPoint;
+      currentClosestPoint = targetPoints[i];
+    }
+  }
+  
+
+  if (currentClosestPoint != null) {
+    PVector dir = currentClosestPoint.copy();
+    dir.sub(particlePos);
+    return dir;
+  } else return null;
+}
 
 PVector getDirectionToNearestFlowerPosition(PVector particlePos) {
   
